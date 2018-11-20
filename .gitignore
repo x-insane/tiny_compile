@@ -1,32 +1,12 @@
-# Prerequisites
-*.d
+# Temporary directories
+_*
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# Builds
+build/
 
-# Precompiled Headers
-*.gch
-*.pch
+# third_lib like google
+third_lib/googletest
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+# Jet Brains
+.idea/
+cmake-build-debug/

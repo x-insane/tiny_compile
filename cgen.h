@@ -1,1 +1,0 @@
-void codeGenerate(TreeNode *t);

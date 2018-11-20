@@ -1,3 +1,0 @@
-/home/yijiull/code/Compile/build/CMakeFiles/rebuild_cache.dir
-/home/yijiull/code/Compile/build/CMakeFiles/main.dir
-/home/yijiull/code/Compile/build/CMakeFiles/edit_cache.dir
