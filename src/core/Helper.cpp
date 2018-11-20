@@ -36,10 +36,10 @@ namespace Helper {
                 return "KEY_ELSE";
             case Token::Type::KEY_END:
                 return "KEY_END";
-            case Token::Type::KEY_READ:
-                return "KEY_READ";
-            case Token::Type::KEY_WRITE:
-                return "KEY_WRITE";
+            case Token::Type::KEY_READ_:
+                return "KEY_READ_";
+            case Token::Type::KEY_WRITE_:
+                return "KEY_WRITE_";
 
             case Token::Type::OP_GTR:
                 return "OP_GTR";
@@ -121,9 +121,9 @@ namespace Helper {
         else if (token == "until")
             return Token::Type::KEY_UNTIL;
         else if (token == "read")
-            return Token::Type::KEY_READ;
+            return Token::Type::KEY_READ_;
         else if (token == "write")
-            return Token::Type::KEY_WRITE;
+            return Token::Type::KEY_WRITE_;
 
         else if (token == ">")
             return Token::Type::OP_GTR;

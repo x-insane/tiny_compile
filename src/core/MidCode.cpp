@@ -91,9 +91,9 @@ std::string MidCode::statement() {
 }
 
 MidCodeGenerator::MidCodeGenerator(TreeNode* root) {
-    codes.push_back(emit(MidCode::Type::START, "-", "-", "-"));
+    codes.push_back(_emit(MidCode::Type::START, "-", "-", "-"));
     generate(root);
-    codes.push_back(emit(MidCode::Type::END, "-", "-", "-"));
+    codes.push_back(_emit(MidCode::Type::END, "-", "-", "-"));
     for (auto code : codes) {
         if (code->jump != -1)
             code->param3 = std::to_string(code->jump);
@@ -105,7 +105,7 @@ MidCodeGenerator::~MidCodeGenerator() {
         delete code;
 }
 
-MidCode* MidCodeGenerator::emit(MidCode::Type type, const std::string &param1,
+MidCode* MidCodeGenerator::_emit(MidCode::Type type, const std::string &param1,
                                 const std::string &param2, const std::string &param3) {
     auto* code = new MidCode;
     code->pos = static_cast<int>(codes.size());
@@ -137,8 +137,8 @@ void MidCodeGenerator::opJump(TreeNode* node, MidCode::Type type, const std::str
     node->T = static_cast<int>(codes.size());
     node->B = node->T;
     node->F = node->T + 1;
-    codes.push_back(emit(type, param1, param2, ""));
-    codes.push_back(emit(MidCode::Type::JUMP, "-", "-", ""));
+    codes.push_back(_emit(type, param1, param2, ""));
+    codes.push_back(_emit(MidCode::Type::JUMP, "-", "-", ""));
 }
 
 std::string MidCodeGenerator::generate(TreeNode* node) {
@@ -151,7 +151,7 @@ std::string MidCodeGenerator::generate(TreeNode* node) {
             generate(node->children[0]);
             int then_b = static_cast<int>(codes.size());
             generate(node->children[1]);
-            MidCode* code = emit(MidCode::Type::JUMP, "-", "-", "");
+            MidCode* code = _emit(MidCode::Type::JUMP, "-", "-", "");
             codes.push_back(code);
             int else_b = static_cast<int>(codes.size());
             generate(node->children[2]);
@@ -161,10 +161,10 @@ std::string MidCodeGenerator::generate(TreeNode* node) {
             break;
         }
         case TreeNode::NodeType::READ_STMT:
-            codes.push_back(emit(MidCode::Type::READ, "-", "-", node->children[0]->token->token));
+            codes.push_back(_emit(MidCode::Type::READ, "-", "-", node->children[0]->token->token));
             break;
         case TreeNode::NodeType::WRITE_STMT: {
-            codes.push_back(emit(MidCode::Type::WRITE, "-", "-", node->children[0]->token->token));
+            codes.push_back(_emit(MidCode::Type::WRITE, "-", "-", node->children[0]->token->token));
             break;
         }
         case TreeNode::NodeType::REPEAT_STMT: {
@@ -183,7 +183,7 @@ std::string MidCodeGenerator::generate(TreeNode* node) {
             generate(node->children[1]); // 循环体
             back_patch(node->children[0]->T, while_t);
             back_patch(node->children[0]->F, static_cast<int>(codes.size() + 1));
-            codes.push_back(emit(MidCode::Type::JUMP, "-", "-", std::to_string(node->children[0]->B)));
+            codes.push_back(_emit(MidCode::Type::JUMP, "-", "-", std::to_string(node->children[0]->B)));
             break;
         }
         case TreeNode::NodeType::STMT_SEQUENCE: {
@@ -192,12 +192,8 @@ std::string MidCodeGenerator::generate(TreeNode* node) {
             break;
         }
         case TreeNode::NodeType::ASSIGN_STMT: {
-//            MidCode* code = emit(MidCode::Type::ASSIGN, "", "-", node->children[0]->token->token);
-//            name = generate(node->children[1]);
-//            code->param1 = name;
-//            codes.push_back(code);
             name = generate(node->children[1]);
-            codes.push_back(emit(MidCode::Type::ASSIGN, name, "-", node->children[0]->token->token));
+            codes.push_back(_emit(MidCode::Type::ASSIGN, name, "-", node->children[0]->token->token));
             break;
         }
         case TreeNode::NodeType::GT_EXP: {
@@ -260,28 +256,28 @@ std::string MidCodeGenerator::generate(TreeNode* node) {
             auto t1 = generate(node->children[0]);
             auto t2 = generate(node->children[1]);
             name = new_tmp_var();
-            codes.push_back(emit(MidCode::Type::ADD, t1, t2, name));
+            codes.push_back(_emit(MidCode::Type::ADD, t1, t2, name));
             break;
         }
         case TreeNode::NodeType::SUB_EXP: {
             auto t1 = generate(node->children[0]);
             auto t2 = generate(node->children[1]);
             name = new_tmp_var();
-            codes.push_back(emit(MidCode::Type::SUB, t1, t2, name));
+            codes.push_back(_emit(MidCode::Type::SUB, t1, t2, name));
             break;
         }
         case TreeNode::NodeType::MUL_EXP: {
             auto t1 = generate(node->children[0]);
             auto t2 = generate(node->children[1]);
             name = new_tmp_var();
-            codes.push_back(emit(MidCode::Type::MUL, t1, t2, name));
+            codes.push_back(_emit(MidCode::Type::MUL, t1, t2, name));
             break;
         }
         case TreeNode::NodeType::DIV_EXP: {
             auto t1 = generate(node->children[0]);
             auto t2 = generate(node->children[1]);
             name = new_tmp_var();
-            codes.push_back(emit(MidCode::Type::DIV, t1, t2, name));
+            codes.push_back(_emit(MidCode::Type::DIV, t1, t2, name));
             break;
         }
         case TreeNode::NodeType::FACTOR: {

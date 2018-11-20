@@ -1,14 +1,13 @@
 #include <string>
 #include <sstream>
 #include "Scanner.h"
-#include "Log.h"
 #include "Helper.h"
 
-std::vector<Token> Scanner::scan(std::ifstream& fin) {
-    Scanner instance(fin);
-    if (Log::hasError()) {
+std::vector<Token> Scanner::scan(std::ifstream& fin, Log& log) {
+    Scanner instance(fin, log);
+    if (log.hasError()) {
         std::stringstream msg;
-        msg << "You have " << Log::getErrorCount() << " errors.";
+        msg << "You have " << log.getErrorCount() << " errors.";
         throw msg.str();
     }
     return instance.getTokens();
@@ -33,7 +32,7 @@ void Scanner::close_word() {
     else if (token.type == Token::Type::ID && t != Token::Type::NONE)
         token.type = t;
     if (token.type == Token::Type::NONE)
-        Log::error("unknown token: " + word, line_number, char_number - 1);
+        log.error("unknown token: " + word, line_number, char_number - 1);
     if (token.type != Token::Type::ANNOTATION)
         list.push_back(token);
     word.clear();
@@ -43,7 +42,7 @@ void Scanner::close_word() {
 
 void Scanner::analyse() {
     if (!in.is_open()) {
-        Log::error("can not load file.", 1, 0);
+        log.error("can not load file.", 1, 0);
         return;
     }
     char ch;
@@ -56,9 +55,9 @@ void Scanner::analyse() {
         char_number ++;
         if (in.fail() || in.eof()) {
             if (type == Token::Type::STRING)
-                Log::error("unclosed string", line_number, char_number);
+                log.error("unclosed string", line_number, char_number);
             if (type == Token::Type::ANNOTATION)
-                Log::error("unclosed annotation", line_number, char_number);
+                log.error("unclosed annotation", line_number, char_number);
             if (!word.empty())
                 close_word();
             break;
@@ -88,7 +87,7 @@ void Scanner::analyse() {
             else if (Helper::isValidSign(ch))
                 isSign = true;
             else if (!Helper::isSeparator(ch))
-                Log::error(std::string("unknown symbol: ") + ch, line_number, char_number);
+                log.error(std::string("unknown symbol: ") + ch, line_number, char_number);
         } else {
             if (type == Token::Type::STRING && ch == '\'') {
                 word += ch;
@@ -104,13 +103,13 @@ void Scanner::analyse() {
 
         if (ch == '\n') {
             if (type == Token::Type::STRING) {
-                Log::error("unclosed string", line_number, char_number);
+                log.error("unclosed string", line_number, char_number);
                 close_word();
                 new_line();
                 continue;
             }
             if (type == Token::Type::ANNOTATION) {
-                Log::error("unclosed annotation", line_number, char_number);
+                log.error("unclosed annotation", line_number, char_number);
                 close_word();
                 new_line();
                 continue;
@@ -128,9 +127,9 @@ void Scanner::analyse() {
         }
 
         if (type == Token::Type::NUMBER && !Helper::isDigit(ch))
-            Log::error(std::string("here must be a digit: ") + ch, line_number, char_number);
+            log.error(std::string("here must be a digit: ") + ch, line_number, char_number);
         if (type == Token::Type::ID && !Helper::isLetter(ch) && !Helper::isDigit(ch))
-            Log::error(std::string("here must be a letter: ") + ch, line_number, char_number);
+            log.error(std::string("here must be a letter: ") + ch, line_number, char_number);
 
         word += ch;
         if (ch == '\n')

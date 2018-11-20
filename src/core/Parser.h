@@ -12,9 +12,10 @@ public:
     class TokenInterface;
 
 private:
-    TokenInterface& interface;
+    TokenInterface& _interface;
     SymbolTable symbol_table;
     TreeNode* root = nullptr;
+    Log& log;
 
 private:
     // temporary variable
@@ -32,7 +33,7 @@ public:
     }
 
 public:
-    inline explicit Parser(TokenInterface& token_interface) : interface(token_interface) {
+    inline explicit Parser(TokenInterface& token_interface, Log& log) : _interface(token_interface), log(log) {
         parse();
     }
 

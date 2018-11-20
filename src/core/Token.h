@@ -13,7 +13,7 @@ struct Token {
         KEY_DO, KEY_WHILE, // do while
         KEY_REPEAT, KEY_UNTIL, // repeat until
         KEY_IF, KEY_THEN, KEY_ELSE, KEY_END, // if then else end
-        KEY_READ, KEY_WRITE, // read write
+        KEY_READ_, KEY_WRITE_, // read write (后加下划线以避免与windows库中关键字冲突)
 
         OP_GTR, OP_LSS, // > <
         OP_LEQ, OP_GEQ, OP_EQU, // <= >= =

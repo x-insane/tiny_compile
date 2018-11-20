@@ -12,7 +12,7 @@ public:
     inline explicit TokenStream(std::vector<Token>& tokens) : list(tokens) { }
 
     inline Token nextToken() override {
-        if (++index < list.size())
+        if (++index < (int) list.size())
             return list[index];
         Token token;
         token.type = Token::Type::NO_MORE_TOKEN;

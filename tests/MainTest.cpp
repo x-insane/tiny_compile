@@ -3,12 +3,12 @@
 using namespace std;
 
 TEST(Main, Test) {
-    Log::setOutputStream(&std::cerr);
+    Log log(std::cerr);
     ifstream fin("../../res/experiment2_test2_in.txt");
     try {
-        auto list = Scanner::scan(fin);
+        auto list = Scanner::scan(fin, log);
         TokenStream stream(list);
-        Parser parser(stream);
+        Parser parser(stream, log);
         MidCodeGenerator coder(parser.getRootTreeNode());
 
         // 输出

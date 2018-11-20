@@ -1,16 +1,29 @@
-# 设置入口文件,将除入口文件外的其他文件打包为库文件,供入口文件和单元测试使用
-set(MAIN_FILE Main.cpp)
+# 打包核心代码
+file(GLOB_RECURSE CORE_FILES "core/*.cpp")
+add_library(${CMAKE_PROJECT_NAME}_core ${CORE_FILES})
 
-# 将当前目录下所有.cpp/.h文件包含进来
-# 注意 file()必须在每次增加/删除文件时 reload project
-file(GLOB_RECURSE source_files "*.cpp" "*.h")
+# 配置 QT5
+set(CMAKE_PREFIX_PATH C:/Qt/5.11.2/mingw53_32)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+if(WIN32)
+    set(CMAKE_WIN32_EXECUTABLE ON)
+endif()
+find_package(Qt5Widgets REQUIRED)
 
-# 去除入口文件
-list(REMOVE_ITEM source_files MAIN_FILE)
+# 配置 QRC
+qt5_add_resources(QRCS )
 
-# 打包成库
-add_library(${CMAKE_PROJECT_NAME}_lib ${source_files})
+# 打包UI文件
+file(GLOB_RECURSE UI_FILES "view/*.ui")
+qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 
-# 生成可执行文件
-add_executable(${CMAKE_PROJECT_NAME}_run ${MAIN_FILE})
-target_link_libraries(${CMAKE_PROJECT_NAME}_run ${CMAKE_PROJECT_NAME}_lib)
+# 打包视图代码
+file(GLOB_RECURSE VIEW_FILES "view/*.cpp")
+
+# 添加可执行文件
+add_executable(${CMAKE_PROJECT_NAME}_run Main.cpp ${VIEW_FILES} ${UI_HEADERS} ${QRCS})
+
+# 添加所有依赖
+target_link_libraries(${CMAKE_PROJECT_NAME}_run Qt5::Widgets ${CMAKE_PROJECT_NAME}_core)

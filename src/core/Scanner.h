@@ -4,10 +4,12 @@
 #include <fstream>
 #include <vector>
 #include "Token.h"
+#include "Log.h"
 
 class Scanner {
     std::ifstream& in;
     std::vector<Token> list;
+    Log& log;
 private:
     // temporary variables
     std::string word;
@@ -16,7 +18,7 @@ private:
     int char_number = -1;
     bool isSign = false;
 private:
-    inline explicit Scanner(std::ifstream& fin) : in(fin) {
+    inline explicit Scanner(std::ifstream& fin, Log& log) : in(fin), log(log) {
         analyse();
     }
 public:
@@ -24,7 +26,7 @@ public:
         return list;
     }
 public:
-    static std::vector<Token> scan(std::ifstream& fin);
+    static std::vector<Token> scan(std::ifstream& fin, Log& log);
 private:
     void new_line();
     void close_word();

@@ -39,7 +39,7 @@ private:
     }
 
 private:
-    MidCode* emit(MidCode::Type type, const std::string& param1, const std::string& param2, const std::string& param3);
+    MidCode* _emit(MidCode::Type type, const std::string& param1, const std::string& param2, const std::string& param3);
     void back_patch(int a, int b);
     int merge(int a, int b);
     void opJump(TreeNode *node, MidCode::Type type, const std::string &param1, const std::string &param2);

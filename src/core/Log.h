@@ -5,28 +5,24 @@
 #include <string>
 
 class Log {
-    static std::ostream* out;
-    static int error_count;
+    std::ostream& out;
+    int error_count = 0;
 public:
-    static inline void setOutputStream(std::ostream* output_stream) {
-        out = output_stream;
-    }
-    static inline int getErrorCount() {
+    inline explicit Log(std::ostream& output_stream) : out(output_stream) {}
+    inline int getErrorCount() {
         return error_count;
     }
-    static inline bool hasError() {
+    inline bool hasError() {
         return error_count != 0;
     }
 
-    static inline void error(const std::string &info, int line, int offset) {
-        if (out)
-            *out << "ERROR IN LINE " << line << ":" << offset << " " << info << std::endl;
+    inline void error(const std::string &info, int line, int offset) {
+        out << "ERROR IN LINE " << line << ":" << offset << " " << info << std::endl;
         error_count ++;
     }
 
-    static inline void parse_error(const std::string &info, int line, int offset) {
-        if (out)
-            *out << "PARSE ERROR IN LINE " << line << ":" << offset << " " << info << std::endl;
+    inline void parse_error(const std::string &info, int line, int offset) {
+        out << "PARSE ERROR IN LINE " << line << ":" << offset << " " << info << std::endl;
         error_count ++;
     }
 };

@@ -3,9 +3,9 @@
 
 void Parser::parse() {
     root = program();
-    if (Log::hasError()) {
+    if (log.hasError()) {
         std::stringstream msg;
-        msg << "You have " << Log::getErrorCount() << " errors.";
+        msg << "You have " << log.getErrorCount() << " errors.";
         throw msg.str();
     }
 }
@@ -13,15 +13,15 @@ void Parser::parse() {
 bool Parser::match(Token::Type expected, bool flag) {
     if (token.type == expected) {
         last_token = token;
-        token = interface.nextToken();
+        token = _interface.nextToken();
         return true;
     } else {
         if (flag) {
             if (token.type == Token::Type::NO_MORE_TOKEN) {
-                Log::parse_error("expected token " + Helper::getTokenTypeName(expected)
+                log.parse_error("expected token " + Helper::getTokenTypeName(expected)
                     + ", but there is no more token", last_token.line, last_token.offset);
             } else {
-                Log::parse_error("unexpected token " + token.token + ", "
+                log.parse_error("unexpected token " + token.token + ", "
                     + Helper::getTokenTypeName(expected) + " expected", token.line, token.offset);
             }
         }
@@ -30,7 +30,7 @@ bool Parser::match(Token::Type expected, bool flag) {
 }
 
 TreeNode* Parser::program() {
-    token = interface.nextToken();
+    token = _interface.nextToken();
     declarations();
     return stmt_sequence();
 }
@@ -50,14 +50,14 @@ void Parser::declarations() {
                 type = VarType::VT_STRING;
                 break;
             default:
-                Log::parse_error("the token can not be parsed to a type: "
+                log.parse_error("the token can not be parsed to a type: "
                     + Helper::getTokenTypeName(token.type), token.line, token.offset);
                 break;
         }
         do {
             std::string name = token.token;
             if (token.type != Token::Type::ID) {
-                Log::parse_error("unexpected token " + token.token + ", "
+                log.parse_error("unexpected token " + token.token + ", "
                     + Helper::getTokenTypeName(Token::Type::ID) + " expected", token.line, token.offset);
                 break;
             }
@@ -72,7 +72,7 @@ void Parser::declarations() {
             else {
                 std::stringstream msg;
                 msg << "the variable " << last_token.token << " has already declared in line " << symbol.lines[0];
-                Log::parse_error(msg.str(), last_token.line, last_token.offset);
+                log.parse_error(msg.str(), last_token.line, last_token.offset);
             }
         } while(match(Token::Type::OP_COMMA));
         match(Token::Type::OP_SEMICOLON, true);
@@ -99,13 +99,13 @@ TreeNode* Parser::statement() {
         case Token::Type::KEY_IF:
             node = if_stmt();
             break;
-        case Token::Type::KEY_READ:
+        case Token::Type::KEY_READ_:
             node = read_stmt();
             break;
         case Token::Type::KEY_REPEAT:
             node = repeat_stmt();
             break;
-        case Token::Type::KEY_WRITE:
+        case Token::Type::KEY_WRITE_:
             node = write_stmt();
             break;
         case Token::Type::KEY_WHILE:
@@ -152,17 +152,17 @@ TreeNode* Parser::assign_stmt() {
 
 TreeNode* Parser::read_stmt() {
     TreeNode* node = TreeNode::create(TreeNode::NodeType::READ_STMT);
-    match(Token::Type::KEY_READ, true);
+    match(Token::Type::KEY_READ_, true);
     if (token.type == Token::Type::ID)
         node->children[0] = factor();
     else
-        Log::parse_error("unexpected token: " + token.token + ", expected ID", token.line, token.offset);
+        log.parse_error("unexpected token: " + token.token + ", expected ID", token.line, token.offset);
     return node;
 }
 
 TreeNode* Parser::write_stmt() {
     TreeNode* node = TreeNode::create(TreeNode::NodeType::WRITE_STMT);
-    match(Token::Type::KEY_WRITE, true);
+    match(Token::Type::KEY_WRITE_, true);
     node->children[0] = or_exp();
     return node;
 }
@@ -303,7 +303,7 @@ TreeNode* Parser::factor() {
             *node->token = token;
             const SymbolTable::Symbol& symbol = symbol_table.lookup(token.token);
             if(&symbol == &SymbolTable::Symbol::NONE)
-                Log::parse_error("the symbol " + token.token + " is not declared", token.line, token.offset);
+                log.parse_error("the symbol " + token.token + " is not declared", token.line, token.offset);
             else {
                 node->varType = symbol.type;
                 symbol_table.insert(token.token, node->varType, token.line);
@@ -342,7 +342,7 @@ TreeNode* Parser::factor() {
             match(Token::Type::OP_RP, true);
             break;
         default:
-            Log::parse_error("unexpected token: " + token.token, token.line, token.offset);
+            log.parse_error("unexpected token: " + token.token, token.line, token.offset);
             break;
     }
     return node;
