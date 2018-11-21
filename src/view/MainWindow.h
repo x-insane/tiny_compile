@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "component/highlighter.h"
+#include "BuildWindow.h"
 
 QT_BEGIN_NAMESPACE
     class QTextEdit;
@@ -35,6 +36,7 @@ private:
 private:
     QString filename;
     QTextEdit *editor;
+    BuildWindow *builder = nullptr;
 };
 
 #endif //TINY_COMPILE_MAIN_WINDOW_H

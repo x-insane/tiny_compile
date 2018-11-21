@@ -52,7 +52,7 @@ BuildWindow::BuildWindow(QString filename, QWidget *parent) :
     std::stringstream code_stream;
     std::stringstream code_statement_stream;
     std::stringstream tree_stream;
-    std::ifstream fin(filename.toStdString());
+    std::ifstream fin(filename.toLocal8Bit().data());
     try {
         Log log(output_stream);
         auto list = Scanner::scan(fin, log);
@@ -114,6 +114,8 @@ BuildWindow::BuildWindow(QString filename, QWidget *parent) :
     src->setFont(font);
     src->setText(srcCode);
     tab->addTab(src, tr("源代码"));
+
+    tab->setCurrentIndex(1);
 }
 
 void BuildWindow::resizeEvent(QResizeEvent *event) {

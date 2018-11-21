@@ -49,6 +49,15 @@ std::string MidCode::quaternary() {
         case Type::DIV:
             op = "/";
             break;
+        case Type::AND:
+            op = "AND";
+            break;
+        case Type::OR:
+            op = "OR";
+            break;
+        case Type::NOT:
+            op = "NOT";
+            break;
     }
     return "(" + op + ", " + param1 + ", " + param2 + ", " + param3 + ")";
 }
@@ -86,6 +95,12 @@ std::string MidCode::statement() {
             return param3 + " := " + param1 + " * " + param2;
         case Type::DIV:
             return param3 + " := " + param1 + " / " + param2;
+        case Type::AND:
+            return param3 + " := " + param1 + " and " + param2;
+        case Type::OR:
+            return param3 + " := " + param1 + " or " + param2;
+        case Type::NOT:
+            return param3 + " := " + " not " + param1;
     }
     return "";
 }
@@ -227,29 +242,43 @@ std::string MidCodeGenerator::generate(TreeNode* node) {
             break;
         }
         case TreeNode::NodeType::AND_EXP: {
-            generate(node->children[0]);
-            generate(node->children[1]);
-            back_patch(node->children[0]->T, node->children[1]->B);
-            node->B = node->children[0]->B;
-            node->T = node->children[1]->T;
-            node->F = merge(node->children[0]->F, node->children[1]->F);
+            auto t1 = generate(node->children[0]);
+            auto t2 = generate(node->children[1]);
+            if (node->stmtType == TreeNode::StatementType::CONDITION) {
+                back_patch(node->children[0]->T, node->children[1]->B);
+                node->B = node->children[0]->B;
+                node->T = node->children[1]->T;
+                node->F = merge(node->children[0]->F, node->children[1]->F);
+            } else {
+                name = new_tmp_var();
+                codes.push_back(_emit(MidCode::Type::AND, t1, t2, name));
+            }
             break;
         }
         case TreeNode::NodeType::OR_EXP: {
-            generate(node->children[0]);
-            generate(node->children[1]);
-            back_patch(node->children[0]->F, node->children[1]->B);
-            node->B = node->children[0]->B;
-            node->T = merge(node->children[0]->T, node->children[1]->T);
-            node->F = node->children[1]->F;
+            auto t1 = generate(node->children[0]);
+            auto t2 = generate(node->children[1]);
+            if (node->stmtType == TreeNode::StatementType::CONDITION) {
+                back_patch(node->children[0]->F, node->children[1]->B);
+                node->B = node->children[0]->B;
+                node->T = merge(node->children[0]->T, node->children[1]->T);
+                node->F = node->children[1]->F;
+            } else {
+                name = new_tmp_var();
+                codes.push_back(_emit(MidCode::Type::OR, t1, t2, name));
+            }
             break;
         }
         case TreeNode::NodeType::NOT_EXP: {
-            generate(node->children[0]);
-            node->B = node->children[0]->B;
-            node->T = node->children[0]->F;
-            node->F = node->children[0]->T;
-            // 没有not的文法
+            auto t = generate(node->children[0]);
+            if (node->stmtType == TreeNode::StatementType::CONDITION) {
+                node->B = node->children[0]->B;
+                node->T = node->children[0]->F;
+                node->F = node->children[0]->T;
+            } else {
+                name = new_tmp_var();
+                codes.push_back(_emit(MidCode::Type::NOT, t, "-", name));
+            }
             break;
         }
         case TreeNode::NodeType::PLUS_EXP: {
@@ -282,6 +311,14 @@ std::string MidCodeGenerator::generate(TreeNode* node) {
         }
         case TreeNode::NodeType::FACTOR: {
             name = node->token->token;
+            if (node->varType == VarType::VT_BOOL && node->stmtType == TreeNode::StatementType::CONDITION) {
+                // 如果原子类型是bool类型而且是条件语句，需要进行跳转判断
+                node->T = codes.size();
+                node->B = node->T;
+                node->F = node->T + 1;
+                codes.push_back(_emit(MidCode::Type::JUMP_EQ, node->token->token, "true", ""));
+                codes.push_back(_emit(MidCode::Type::JUMP, "-", "-", ""));
+            }
             break;
         }
         default:

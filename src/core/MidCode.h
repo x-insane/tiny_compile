@@ -11,7 +11,8 @@ struct MidCode {
         READ, WRITE, ASSIGN,
         JUMP, JUMP_LSS, JUMP_GRT,
         JUMP_EQ, JUMP_LEQ, JUMP_GEQ,
-        ADD, SUB, MUL, DIV
+        ADD, SUB, MUL, DIV,
+        AND, OR, NOT
     };
 
     int jump = -1;

@@ -1,6 +1,5 @@
 #include <QtWidgets>
 #include "MainWindow.h"
-#include "BuildWindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent)
@@ -150,12 +149,20 @@ void MainWindow::setTextModified(bool isModified) {
 }
 
 void MainWindow::build() {
+    if (editor->toPlainText().isEmpty()) {
+        QMessageBox::information(this, "提示", "没有待编译代码");
+        return;
+    }
     if (filename.isEmpty())
         saveFileAs();
     else
         saveFile();
     if (filename.isEmpty())
         return;
-    auto *builder = new BuildWindow(filename);
+    if (builder) {
+        builder->close();
+        delete builder;
+    }
+    builder = new BuildWindow(filename);
     builder->show();
 }

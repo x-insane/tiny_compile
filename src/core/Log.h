@@ -22,7 +22,12 @@ public:
     }
 
     inline void parse_error(const std::string &info, int line, int offset) {
-        out << "PARSE ERROR IN LINE " << line << ":" << offset << " " << info << std::endl;
+        out << "SYNTAX ERROR IN LINE " << line << ":" << offset << " " << info << std::endl;
+        error_count ++;
+    }
+
+    inline void type_error(const std::string &info, int line, int offset) {
+        out << "TYPE ERROR IN LINE " << line << ":" << offset << " " << info << std::endl;
         error_count ++;
     }
 };

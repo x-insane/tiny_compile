@@ -40,6 +40,8 @@ public:
 private:
     void parse();
     bool match(Token::Type expected, bool flag = false /* 是否强制匹配 */);
+    void checkType(TreeNode* node);
+    void checkStatementType(TreeNode* node, TreeNode::StatementType parentStmtType = TreeNode::StatementType::NONE);
 
 private:
     TreeNode* program();

@@ -16,8 +16,12 @@ struct TreeNode {
         FACTOR,
         NONE
     };
+    enum class StatementType {
+        NONE, CONDITION, ASSIGN
+    };
 
     NodeType type = NodeType::NONE;
+    StatementType stmtType = StatementType::NONE;
     VarType varType = VarType::VT_VOID;
     TreeNode *children[MAX_CHILDREN] { nullptr };
     Token* token = nullptr;

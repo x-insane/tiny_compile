@@ -16,6 +16,7 @@ public:
             return list[index];
         Token token;
         token.type = Token::Type::NO_MORE_TOKEN;
+        token.token = "EOF";
         return token;
     }
 };
