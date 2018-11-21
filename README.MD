@@ -3,8 +3,11 @@
 ### 编译环境
 
 cmake 3.12
+
 make(mingw32-make on windows)
+
 Qt 5.11.2
+
 g++ gcc
 
 cmake或Qt其他版本可修改CMakeLists.txt
@@ -13,8 +16,9 @@ cmake或Qt其他版本可修改CMakeLists.txt
 
 src/CMakeLists.txt中需指定Qt路径
 
-> linux: set(CMAKE_PREFIX_PATH /qt_path/version/gcc_64)
-> windows: set(CMAKE_PREFIX_PATH /qt_path/version/mingw53_32)
+linux: set(CMAKE_PREFIX_PATH /qt_path/version/gcc_64)
+
+windows: set(CMAKE_PREFIX_PATH /qt_path/version/mingw53_32)
 
 ### 编译代码
 
